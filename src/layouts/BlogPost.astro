@@ -1,0 +1,232 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import ShareButtons from '../components/ShareButtons.astro';
+import { SITE_TITLE } from '../consts';
+
+type Props = CollectionEntry<'blog'>['data'] & { slug: string };
+
+const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.props;
+const articleUrl = new URL(`/blog/${slug}`, Astro.site || 'https://twincitiesdad.com').toString();
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
+		<style>
+			main {
+				width: 100%;
+				max-width: 100%;
+				margin: 0;
+				padding: 0;
+			}
+			
+			.hero-image {
+				width: 100%;
+				max-height: 500px;
+				overflow: hidden;
+				position: relative;
+			}
+			
+			.hero-image::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 150px;
+				background: linear-gradient(transparent, var(--bg-primary));
+			}
+			
+			.hero-image img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: 0;
+			}
+			
+			.prose {
+				width: 720px;
+				max-width: calc(100% - 3rem);
+				margin: 0 auto;
+				padding: 2rem 1.5rem;
+			}
+			
+			.article-header {
+				margin-bottom: 2.5rem;
+				padding-bottom: 1.5rem;
+				border-bottom: 1px solid var(--bg-tertiary);
+			}
+			
+			.meta {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				margin-bottom: 1rem;
+				font-size: 0.9rem;
+				color: var(--text-muted);
+			}
+			
+			.date {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			
+			.updated {
+				font-style: italic;
+				opacity: 0.8;
+			}
+			
+			h1 {
+				font-size: clamp(2rem, 5vw, 3rem);
+				line-height: 1.2;
+				margin-bottom: 1rem;
+				color: var(--text-primary);
+			}
+			
+			.description {
+				font-size: 1.25rem;
+				color: var(--text-secondary);
+				line-height: 1.6;
+				margin: 0;
+			}
+			
+			.content {
+				font-size: 1.1rem;
+				line-height: 1.8;
+			}
+			
+			.content :global(h2) {
+				margin-top: 2.5rem;
+				margin-bottom: 1rem;
+			}
+			
+			.content :global(h3) {
+				margin-top: 2rem;
+				margin-bottom: 0.75rem;
+			}
+			
+			.content :global(p) {
+				margin-bottom: 1.5rem;
+				color: var(--text-secondary);
+			}
+			
+			.content :global(img) {
+				margin: 2rem 0;
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-lg);
+			}
+			
+			.content :global(a) {
+				color: var(--accent-light);
+				text-decoration: underline;
+				text-decoration-color: var(--accent);
+				text-underline-offset: 3px;
+			}
+			
+			.content :global(a:hover) {
+				color: var(--accent);
+			}
+			
+			.content :global(ul), .content :global(ol) {
+				margin-bottom: 1.5rem;
+				padding-left: 1.5rem;
+			}
+			
+			.content :global(li) {
+				color: var(--text-secondary);
+				margin-bottom: 0.5rem;
+			}
+			
+			/* Video embeds */
+			.content :global(iframe) {
+				width: 100%;
+				aspect-ratio: 16/9;
+				border-radius: var(--radius-lg);
+				margin: 2rem 0;
+			}
+			
+			/* Comments section placeholder */
+			.comments-section {
+				margin-top: 3rem;
+				padding-top: 2rem;
+				border-top: 1px solid var(--bg-tertiary);
+			}
+			
+			.comments-section h3 {
+				margin-bottom: 1.5rem;
+				font-family: 'Inter', sans-serif;
+				font-size: 1.25rem;
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				{heroImage && (
+					<div class="hero-image">
+						<Image width={1400} height={500} src={heroImage} alt="" />
+					</div>
+				)}
+				<div class="prose">
+					<header class="article-header">
+						<div class="meta">
+							<span class="date">
+								📅 <FormattedDate date={pubDate} />
+							</span>
+							{updatedDate && (
+								<span class="updated">
+									(Updated: <FormattedDate date={updatedDate} />)
+								</span>
+							)}
+						</div>
+						<h1>{title}</h1>
+						{description && <p class="description">{description}</p>}
+					</header>
+					
+					<div class="content">
+						<slot />
+					</div>
+					
+					<ShareButtons title={title} url={articleUrl} />
+					
+					<section class="comments-section">
+						<h3>💬 Comments</h3>
+						<div id="giscus-container">
+							<script 
+								src="https://giscus.app/client.js"
+								data-repo="Grimwizza/twincitiesdad"
+								data-repo-id=""
+								data-category="Comments"
+								data-category-id=""
+								data-mapping="pathname"
+								data-strict="0"
+								data-reactions-enabled="1"
+								data-emit-metadata="0"
+								data-input-position="top"
+								data-theme="dark_dimmed"
+								data-lang="en"
+								data-loading="lazy"
+								crossorigin="anonymous"
+								async>
+							</script>
+							<noscript>
+								<p style="color: var(--text-muted); font-size: 0.9rem;">
+									Enable JavaScript to view comments. Powered by <a href="https://giscus.app" target="_blank">Giscus</a>.
+								</p>
+							</noscript>
+						</div>
+					</section>
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
