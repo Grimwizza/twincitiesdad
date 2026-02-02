@@ -1,0 +1,264 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import EventCard from "../components/EventCard.astro";
+import EventList from "../components/EventList.astro";
+import EventFilters from "../components/EventFilters.astro";
+import CalendarView from "../components/CalendarView.astro";
+import MapView from "../components/MapView.astro";
+import { SITE_TITLE } from "../consts";
+import { localEvents } from "../data/events"; // Renamed import to be clear
+import { fetchExternalEvents } from "../utils/eventFetcher";
+
+// Force SSR for this page to support query parameter navigation
+export const prerender = false;
+
+// Fetch external events at build time
+const externalEvents = await fetchExternalEvents();
+
+// Combine hardcoded + external events
+const events = [...localEvents, ...externalEvents].sort(
+	(a, b) => a.date.getTime() - b.date.getTime(),
+);
+
+// Parse URL params for Calendar View (always parse, not just when view=calendar)
+const mParam = Astro.url.searchParams.get("month");
+const yParam = Astro.url.searchParams.get("year");
+const initialMonth = mParam ? parseInt(mParam, 10) : undefined;
+const initialYear = yParam ? parseInt(yParam, 10) : undefined;
+---
+
+<PageLayout
+	title={`Events | ${SITE_TITLE}`}
+	description="Upcoming events, protests, and community gatherings in the Twin Cities."
+>
+	<style>
+		.page-header {
+			text-align: center;
+			padding: 4rem 1.5rem 3rem;
+			background:
+				radial-gradient(
+					ellipse at top,
+					rgba(34, 197, 94, 0.1) 0%,
+					transparent 50%
+				),
+				var(--bg-primary);
+		}
+
+		.page-header h1 {
+			font-size: clamp(2rem, 5vw, 3rem);
+			margin-bottom: 0.5rem;
+		}
+
+		.page-header p {
+			color: var(--text-muted);
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.suggest-box {
+			margin-top: 1.5rem;
+			display: inline-block;
+			font-size: 0.9rem;
+			padding: 0.5rem 1rem;
+			background: var(--bg-tertiary);
+			border-radius: var(--radius-lg);
+			color: var(--text-secondary);
+		}
+
+		.suggest-box a {
+			color: var(--accent-light);
+			font-weight: 500;
+		}
+
+		.controls-section {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.view-switcher {
+			display: flex;
+			background: var(--bg-secondary);
+			padding: 0.25rem;
+			border-radius: var(--radius-lg);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+		}
+
+		.view-toggle-btn {
+			background: transparent;
+			border: none;
+			color: var(--text-secondary);
+			width: 36px;
+			height: 36px;
+			border-radius: var(--radius-md);
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all var(--transition-fast);
+		}
+
+		.view-toggle-btn.active {
+			background: var(--bg-tertiary);
+			color: var(--accent-light);
+		}
+
+		.view-toggle-btn:hover:not(.active) {
+			color: var(--text-primary);
+		}
+
+		@media (max-width: 768px) {
+			.controls-section {
+				flex-direction: column;
+				align-items: stretch;
+				gap: 0.75rem;
+			}
+
+			/* View switcher on top, centered, with larger buttons on mobile */
+			.view-switcher {
+				align-self: center;
+				order: -1; /* Move to top */
+				padding: 0.35rem;
+			}
+
+			.view-toggle-btn {
+				width: 44px;
+				height: 44px;
+			}
+		}
+	</style>
+
+	<main class="container">
+		<header class="page-header">
+			<h1>🗓️ Twin Cities Events</h1>
+			<p>
+				Stay informed about protests, concerts, and community gatherings
+				happening near you.
+			</p>
+
+			<div class="suggest-box">
+				Know of an event? <a href="mailto:events@twincitiesdad.com"
+					>Submit an event →</a
+				>
+			</div>
+		</header>
+
+		<div class="events-page-container">
+			<div class="controls-section">
+				<EventFilters />
+
+				<div class="view-switcher">
+					<button
+						class="view-toggle-btn active"
+						data-view="list"
+						aria-label="List View"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><line x1="8" y1="6" x2="21" y2="6"></line><line
+								x1="8"
+								y1="12"
+								x2="21"
+								y2="12"></line><line
+								x1="8"
+								y1="18"
+								x2="21"
+								y2="18"></line><line
+								x1="3"
+								y1="6"
+								x2="3.01"
+								y2="6"></line><line
+								x1="3"
+								y1="12"
+								x2="3.01"
+								y2="12"></line><line
+								x1="3"
+								y1="18"
+								x2="3.01"
+								y2="18"></line></svg
+						>
+					</button>
+					<button
+						class="view-toggle-btn"
+						data-view="calendar"
+						aria-label="Calendar View"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><rect
+								x="3"
+								y="4"
+								width="18"
+								height="18"
+								rx="2"
+								ry="2"></rect><line
+								x1="16"
+								y1="2"
+								x2="16"
+								y2="6"></line><line x1="8" y1="2" x2="8" y2="6"
+							></line><line x1="3" y1="10" x2="21" y2="10"
+							></line></svg
+						>
+					</button>
+					<button
+						class="view-toggle-btn"
+						data-view="map"
+						aria-label="Map View"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><polygon
+								points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"
+							></polygon><line x1="8" y1="2" x2="8" y2="18"
+							></line><line x1="16" y1="6" x2="16" y2="22"
+							></line></svg
+						>
+					</button>
+				</div>
+			</div>
+
+			<div id="map-view" style="display: none;">
+				<MapView />
+			</div>
+
+			<div id="list-view">
+				<EventList />
+			</div>
+
+			<div id="calendar-view" style="display: none;">
+				<CalendarView
+					initialMonth={initialMonth}
+					initialYear={initialYear}
+					events={events}
+				/>
+			</div>
+		</div>
+	</main>
+	<script src="../scripts/events.ts"></script>
+</PageLayout>

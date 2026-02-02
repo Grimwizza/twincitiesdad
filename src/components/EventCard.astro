@@ -1,0 +1,301 @@
+---
+import { Image } from 'astro:assets';
+import type { Event } from '../data/events';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	event: Event;
+}
+
+const { event } = Astro.props;
+
+const typeColors = {
+	protest: 'bg-red-500/20 text-red-300 border-red-500/30',
+	concert: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+	community: 'bg-green-500/20 text-green-300 border-green-500/30',
+	sports: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+	arts: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+	other: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
+};
+
+const typeLabels = {
+	protest: '🚨 Protest / Action',
+	concert: '🎵 Concert',
+	community: '🏡 Community',
+	sports: '🏒 Sports',
+	arts: '🎭 Arts & Theater',
+	other: '📅 Event',
+};
+
+const kidFriendlyConfig = {
+	yes: { label: '👶 Kids Safe', class: 'bg-green-500/10 text-green-400 border-green-500/20' },
+	no: { label: '🔞 18+ / Not Rec', class: 'bg-red-500/10 text-red-400 border-red-500/20' },
+	caution: { label: '⚠️ Use Caution', class: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
+};
+
+const badgeClass = typeColors[event.type] || typeColors.other;
+const label = typeLabels[event.type] || typeLabels.other;
+const kidBadge = event.kidFriendly ? kidFriendlyConfig[event.kidFriendly] : null;
+---
+
+<article class="event-card" data-type={event.type} data-kid-friendly={event.kidFriendly} data-is-free={event.price === 'Free' || event.price === 'Free to Watch' ? 'yes' : 'no'} data-region={event.region}>
+	<div class="event-content">
+		<div class="event-header">
+			<div class="badge-group">
+				<span class={`event-badge ${badgeClass}`}>{label}</span>
+				{kidBadge && (
+					<span class={`event-badge ${kidBadge.class}`}>{kidBadge.label}</span>
+				)}
+			</div>
+			{event.price && <span class="event-price">{event.price}</span>}
+		</div>
+		
+		<h3 class="event-title">
+			{event.link ? (
+				<a href={event.link} target="_blank" rel="noopener noreferrer">
+					{event.title}
+				</a>
+			) : (
+				event.title
+			)}
+		</h3>
+		
+		<div class="event-meta">
+			<div class="meta-item time">
+				<span class="icon">🕒</span>
+				<FormattedDate date={event.date} /> 
+				<span class="time-text">at {event.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+			</div>
+			<div class="meta-item location">
+				<span class="icon">📍</span>
+				<span>{event.location}</span>
+			</div>
+		</div>
+		
+		<p class="event-description">{event.description}</p>
+		
+			<div class="card-actions">
+				{event.link && (
+					<a href={event.link} target="_blank" rel="noopener noreferrer" class="event-link">
+						More Details →
+					</a>
+				)}
+				<button 
+					class="share-btn" 
+					data-share-title={event.title}
+					data-share-text={`${event.title} at ${event.location}`}
+					data-share-url={event.link || Astro.url.href}
+					aria-label="Share event"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+				</button>
+			</div>
+	</div>
+	
+	{event.image && (
+		<div class="event-image">
+			<img 
+				src={event.image} 
+				alt="" 
+				loading="lazy" 
+				onerror="this.parentElement.style.display='none'"
+			/>
+		</div>
+	)}
+</article>
+
+<style>
+	.event-card {
+		display: flex;
+		gap: 1.5rem;
+		background: var(--bg-secondary);
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		border-radius: var(--radius-xl);
+		padding: 1.5rem;
+		transition: transform var(--transition-base), border-color var(--transition-base);
+	}
+	
+	.event-card:hover {
+		transform: translateY(-2px);
+		border-color: rgba(59, 130, 246, 0.3);
+		box-shadow: var(--shadow-lg);
+	}
+	
+	.event-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.event-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 0.75rem;
+		gap: 1rem;
+	}
+	
+	.badge-group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	
+	.event-badge {
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.25rem 0.75rem;
+		border-radius: 9999px;
+		border: 1px solid;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+	
+	/* Utility classes for badges manually applied since Tailwind isn't fully set up with these custom classes */
+	.bg-red-500\/20 { background-color: rgba(239, 68, 68, 0.2); }
+	.text-red-300 { color: #fca5a5; }
+	.border-red-500\/30 { border-color: rgba(239, 68, 68, 0.3); }
+	
+	.bg-blue-500\/20 { background-color: rgba(59, 130, 246, 0.2); }
+	.text-blue-300 { color: #93c5fd; }
+	.border-blue-500\/30 { border-color: rgba(59, 130, 246, 0.3); }
+	
+	.bg-green-500\/20 { background-color: rgba(34, 197, 94, 0.2); }
+	.text-green-300 { color: #86efac; }
+	.border-green-500\/30 { border-color: rgba(34, 197, 94, 0.3); }
+	
+	.bg-gray-500\/20 { background-color: rgba(107, 114, 128, 0.2); }
+	.text-gray-300 { color: #d1d5db; }
+	.border-gray-500\/30 { border-color: rgba(107, 114, 128, 0.3); }
+
+	.bg-orange-500\/20 { background-color: rgba(249, 115, 22, 0.2); }
+	.text-orange-300 { color: #fdba74; }
+	.border-orange-500\/30 { border-color: rgba(249, 115, 22, 0.3); }
+
+	.bg-purple-500\/20 { background-color: rgba(168, 85, 247, 0.2); }
+	.text-purple-300 { color: #d8b4fe; }
+	.border-purple-500\/30 { border-color: rgba(168, 85, 247, 0.3); }
+	
+	/* Kid friendly specific styles */
+	.bg-green-500\/10 { background-color: rgba(34, 197, 94, 0.1); }
+	.text-green-400 { color: #4ade80; }
+	.border-green-500\/20 { border-color: rgba(34, 197, 94, 0.2); }
+	
+	.bg-red-500\/10 { background-color: rgba(239, 68, 68, 0.1); }
+	.text-red-400 { color: #f87171; }
+	.border-red-500\/20 { border-color: rgba(239, 68, 68, 0.2); }
+	
+	.bg-yellow-500\/10 { background-color: rgba(234, 179, 8, 0.1); }
+	.text-yellow-400 { color: #facc15; }
+	.border-yellow-500\/20 { border-color: rgba(234, 179, 8, 0.2); }
+	
+	.event-price {
+		font-size: 0.9rem;
+		color: var(--text-muted);
+		font-variant-numeric: tabular-nums;
+	}
+	
+	.event-title {
+		font-size: 1.25rem;
+		margin: 0 0 0.75rem;
+		line-height: 1.3;
+	}
+	
+	.event-title a {
+		color: var(--text-primary);
+		text-decoration: none;
+		transition: color var(--transition-fast);
+	}
+	
+	.event-title a:hover {
+		color: var(--accent-light);
+	}
+	
+	.event-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+	}
+	
+	.meta-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	
+	.icon {
+		opacity: 0.8;
+	}
+	
+	.event-description {
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--text-secondary);
+		margin-bottom: 1rem;
+		flex: 1;
+	}
+	
+	.card-actions {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: auto;
+	}
+
+	.event-link {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--accent-light);
+	}
+	
+	.share-btn {
+		background: transparent;
+		border: none;
+		color: var(--text-muted);
+		cursor: pointer;
+		padding: 0.5rem;
+		border-radius: 50%;
+		transition: all var(--transition-fast);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.share-btn:hover {
+		background: var(--bg-tertiary);
+		color: var(--text-primary);
+	}
+	
+	.event-image {
+		width: 180px;
+		aspect-ratio: 1;
+		flex-shrink: 0;
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+	}
+	
+	.event-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform var(--transition-slow);
+	}
+	
+	.event-card:hover .event-image img {
+		transform: scale(1.05);
+	}
+	
+	@media (max-width: 640px) {
+		.event-card {
+			flex-direction: column-reverse;
+		}
+		
+		.event-image {
+			width: 100%;
+			aspect-ratio: 16/9;
+		}
+	}
+</style>

@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import NewsFeed from '../components/NewsFeed.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import { SITE_DESCRIPTION, SITE_TITLE, SOCIAL_LINKS } from '../consts';
 
@@ -242,7 +243,7 @@ const recentPosts = posts.slice(1, 5);
 		<Header />
 		<main>
 			<!-- Hero Section -->
-			<section class="hero">
+			<section class="hero" id="hero-section">
 				<span class="hero-badge">📍 Minneapolis-St. Paul</span>
 				<h1>Raising Kids in <span class="text-gradient">Minnesota</span></h1>
 				<p class="hero-subtitle">
@@ -254,6 +255,43 @@ const recentPosts = posts.slice(1, 5);
 					<a href="/about" class="btn btn-secondary">About Me</a>
 				</div>
 			</section>
+			
+			<script>
+				// Local high-quality Twin Cities images
+				const heroImages = [
+					'/images/heroes/hero-1.jpg',
+					'/images/heroes/hero-2.jpg',
+					'/images/heroes/hero-3.jpg',
+					'/images/heroes/hero-4.jpg',
+					'/images/heroes/hero-5.jpg',
+					'/images/heroes/hero-6.jpg'
+				];
+
+				function setRandomHeroImage() {
+					const heroSection = document.getElementById('hero-section');
+					if (!heroSection) return;
+
+					// Select random image
+					const randomImage = heroImages[Math.floor(Math.random() * heroImages.length)];
+					
+					// Create a new image object to preload
+					const img = new Image();
+					img.onload = () => {
+						// Apply background with gradient overlay for text readability
+						heroSection.style.background = `
+							linear-gradient(rgba(17, 24, 39, 0.7), rgba(17, 24, 39, 0.8)),
+							url('${randomImage}') no-repeat center center/cover
+						`;
+						heroSection.style.transition = 'background 0.5s ease-in-out';
+					};
+					img.src = randomImage;
+				}
+
+				// Run on load
+				setRandomHeroImage();
+			</script>
+			
+			<NewsFeed />
 			
 			{latestPost && (
 				<section class="featured-section">

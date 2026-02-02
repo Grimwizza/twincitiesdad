@@ -1,0 +1,202 @@
+---
+
+---
+
+<div class="filters-container">
+	<div class="filter-group type-filters">
+		<button class="filter-pill active" data-filter="all">All Events</button>
+		<button class="filter-pill" data-filter="protest">
+			<span class="icon">🚨</span> Protest
+		</button>
+		<button class="filter-pill" data-filter="concert">
+			<span class="icon">🎵</span> Concert
+		</button>
+		<button class="filter-pill" data-filter="community">
+			<span class="icon">🏡</span> Community
+		</button>
+		<button class="filter-pill" data-filter="sports">
+			<span class="icon">🏒</span> Sports
+		</button>
+		<button class="filter-pill" data-filter="arts">
+			<span class="icon">🎭</span> Arts
+		</button>
+	</div>
+
+	<div class="filter-controls-right">
+		<div class="filter-group toggle-group">
+			<label class="toggle-switch">
+				<input type="checkbox" id="free-only-toggle" />
+				<span class="slider round"></span>
+			</label>
+			<span class="toggle-label">💰 Free Only</span>
+		</div>
+
+		<div class="filter-group toggle-group">
+			<label class="toggle-switch">
+				<input type="checkbox" id="kid-friendly-toggle" />
+				<span class="slider round"></span>
+			</label>
+			<span class="toggle-label">👶 Kid Friendly Only</span>
+		</div>
+	</div>
+</div>
+
+<style>
+	.filters-container {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+		align-items: center;
+		justify-content: space-between;
+		background: var(--bg-secondary);
+		padding: 1rem;
+		border-radius: var(--radius-xl);
+		margin-bottom: 2rem;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+	}
+
+	.type-filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.filter-pill {
+		background: transparent;
+		border: 1px solid var(--bg-tertiary);
+		color: var(--text-secondary);
+		padding: 0.5rem 1rem;
+		border-radius: 9999px;
+		cursor: pointer;
+		font-size: 0.9rem;
+		font-weight: 500;
+		transition: all var(--transition-fast);
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.filter-pill:hover {
+		border-color: var(--accent-light);
+		color: var(--text-primary);
+	}
+
+	.filter-pill.active {
+		background: var(--accent-light);
+		border-color: var(--accent-light);
+		color: white;
+	}
+
+	.filter-pill .icon {
+		font-size: 1rem;
+	}
+
+	.filter-controls-right {
+		display: flex;
+		gap: 1.5rem;
+		align-items: center;
+	}
+
+	.toggle-group {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.toggle-label {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--text-primary);
+	}
+
+	/* Toggle Switch */
+	.toggle-switch {
+		position: relative;
+		display: inline-block;
+		width: 44px;
+		height: 24px;
+	}
+
+	.toggle-switch input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+
+	.slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: var(--bg-tertiary);
+		transition: 0.4s;
+	}
+
+	.slider:before {
+		position: absolute;
+		content: "";
+		height: 18px;
+		width: 18px;
+		left: 3px;
+		bottom: 3px;
+		background-color: white;
+		transition: 0.4s;
+	}
+
+	input:checked + .slider {
+		background-color: var(--accent-light);
+	}
+
+	input:checked + .slider:before {
+		transform: translateX(20px);
+	}
+
+	.slider.round {
+		border-radius: 34px;
+	}
+
+	.slider.round:before {
+		border-radius: 50%;
+	}
+
+	@media (max-width: 640px) {
+		.filters-container {
+			flex-direction: column;
+			align-items: stretch;
+			padding: 0.75rem;
+			gap: 0.75rem;
+		}
+
+		/* Horizontal scrolling filter pills on mobile */
+		.type-filters {
+			overflow-x: auto;
+			flex-wrap: nowrap;
+			padding-bottom: 0.5rem;
+			margin: 0 -0.75rem;
+			padding-left: 0.75rem;
+			padding-right: 0.75rem;
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: none; /* Firefox */
+		}
+
+		.type-filters::-webkit-scrollbar {
+			display: none; /* Chrome/Safari */
+		}
+
+		.filter-pill {
+			flex-shrink: 0; /* Prevent shrinking */
+		}
+
+		.filter-controls-right {
+			flex-wrap: wrap;
+			gap: 0.75rem;
+		}
+
+		.toggle-group {
+			border-top: 1px solid var(--bg-tertiary);
+			padding-top: 0.75rem;
+		}
+	}
+</style>

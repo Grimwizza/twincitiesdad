@@ -1,0 +1,294 @@
+---
+import type { Event } from '../data/events';
+
+// Calendar logic
+interface Props {
+	initialMonth?: number;
+	initialYear?: number;
+	events: Event[];
+}
+
+const { initialMonth, initialYear, events } = Astro.props;
+
+const today = new Date();
+// Use props if provided, otherwise default to current (0-indexed month)
+const currentMonth = initialMonth !== undefined ? initialMonth : today.getMonth();
+const currentYear = initialYear !== undefined ? initialYear : today.getFullYear();
+
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const currentMonthName = monthNames[currentMonth];
+
+const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+// Create grid array
+const grid = [];
+// Add empty cells for days before the 1st
+for (let i = 0; i < firstDayOfMonth; i++) {
+	grid.push(null);
+}
+// Add days
+for (let i = 1; i <= daysInMonth; i++) {
+	grid.push(i);
+}
+
+const getEventsForDay = (day: number) => {
+	if (!day) return [];
+	return events.filter(event => {
+		const eDate = new Date(event.date);
+		return eDate.getDate() === day && eDate.getMonth() === currentMonth && eDate.getFullYear() === currentYear;
+	});
+};
+---
+
+<div class="calendar-container">
+	<div class="calendar-header">
+		<h3>{currentMonthName} {currentYear}</h3>
+		<div class="view-controls">
+			<a href={`?view=calendar&month=${currentMonth === 0 ? 11 : currentMonth - 1}&year=${currentMonth === 0 ? currentYear - 1 : currentYear}`} class="view-btn" id="prev-month" aria-label="Previous Month" data-astro-reload>←</a>
+			<a href={`?view=calendar&month=${currentMonth === 11 ? 0 : currentMonth + 1}&year=${currentMonth === 11 ? currentYear + 1 : currentYear}`} class="view-btn" id="next-month" aria-label="Next Month" data-astro-reload>→</a>
+		</div>
+	</div>
+	
+	<div class="calendar-grid">
+		<div class="weekday">Sun</div>
+		<div class="weekday">Mon</div>
+		<div class="weekday">Tue</div>
+		<div class="weekday">Wed</div>
+		<div class="weekday">Thu</div>
+		<div class="weekday">Fri</div>
+		<div class="weekday">Sat</div>
+		
+		{grid.map((day) => {
+			const dayEvents = day ? getEventsForDay(day) : [];
+			const isToday = day === today.getDate() && currentMonth === today.getMonth();
+			
+			return (
+				<div class={`calendar-day ${day ? 'active' : 'empty'} ${isToday ? 'current' : ''}`}>
+					{day && <span class="day-number">{day}</span>}
+					
+					{dayEvents.length > 0 && (
+						<div class="day-events">
+							{dayEvents.slice(0, 3).map(event => (
+							event.link ? (
+								<a 
+									href={event.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									class={`cal-event-pill ${event.type}`} 
+									title={`${event.title} (${event.type})`}
+									data-event-id={event.id}
+									data-kid-friendly={event.kidFriendly}
+									data-is-free={event.price === 'Free' || event.price === 'Free to Watch' ? 'yes' : 'no'}
+								>
+									{event.title}
+								</a>
+							) : (
+								<span 
+									class={`cal-event-pill ${event.type} no-link`} 
+									title={`${event.title} (${event.type})`}
+									data-event-id={event.id}
+									data-kid-friendly={event.kidFriendly}
+									data-is-free={event.price === 'Free' || event.price === 'Free to Watch' ? 'yes' : 'no'}
+								>
+									{event.title}
+								</span>
+							)
+						))}
+							{dayEvents.length > 3 && <div class="more-events">+{dayEvents.length - 3} more</div>}
+						</div>
+					)}
+				</div>
+			);
+		})}
+	</div>
+</div>
+
+<style>
+	.calendar-container {
+		background: var(--bg-secondary);
+		border-radius: var(--radius-xl);
+		padding: 1rem;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		width: 100%;
+		/* overflow-x: auto; -- Removed to force scaling */
+		box-sizing: border-box;
+	}
+	
+	.calendar-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+		/* min-width: 300px; */
+	}
+	
+	.calendar-header h3 {
+		font-size: 1.5rem;
+		margin: 0;
+	}
+	
+	.view-btn {
+		background: var(--bg-tertiary);
+		border: none;
+		color: var(--text-primary);
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background var(--transition-fast);
+	}
+	
+	.view-btn:hover {
+		background: var(--accent-light);
+		color: white;
+	}
+	
+	.calendar-grid {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr); /* Equal width columns */
+		gap: 0.25rem;
+		width: 100%;
+		/* No min-width to allow full shrinking */
+	}
+	
+	.weekday {
+		text-align: center;
+		font-weight: 600;
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		padding-bottom: 0.5rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	
+	.calendar-day {
+		background: var(--bg-primary);
+		border-radius: var(--radius-lg);
+		padding: 0.25rem;
+		border: 1px solid transparent;
+		display: flex;
+		flex-direction: column;
+		min-height: 80px;
+		min-width: 0; /* CRITICAL: Allows grid item to shrink below content size */
+		overflow: hidden; /* Ensures content stays inside */
+	}
+	
+	.calendar-day.empty {
+		background: transparent;
+	}
+	
+	.calendar-day.current {
+		border-color: var(--accent-light);
+		background: rgba(59, 130, 246, 0.1);
+	}
+	
+	.day-number {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--text-muted);
+		margin-bottom: 0.25rem;
+	}
+	
+	.current .day-number {
+		color: var(--accent-light);
+		font-weight: 700;
+	}
+	
+	.day-events {
+		display: flex;
+		flex-direction: column; /* Stack vertically */
+		gap: 2px;
+		width: 100%; /* Fill width */
+	}
+	
+	/* Event Pills */
+	.cal-event-pill {
+		display: block;
+		font-size: 0.75rem;
+		padding: 0.15rem 0.4rem;
+		border-radius: 4px;
+		margin-bottom: 1px;
+		white-space: nowrap; /* Force single line */
+		overflow: hidden; /* Hide overflow */
+		text-overflow: ellipsis; /* Add ... */
+		text-decoration: none;
+		color: white;
+		transition: opacity 0.2s;
+		max-width: 100%; /* Ensure it truncates */
+	}
+
+	.cal-event-pill:hover {
+		opacity: 0.8;
+	}
+
+	.cal-event-pill.protest { background-color: #ef4444; }
+	.cal-event-pill.concert { background-color: #3b82f6; }
+	.cal-event-pill.community { background-color: #22c55e; }
+	.cal-event-pill.sports { background-color: #f97316; }
+	.cal-event-pill.arts { background-color: #a855f7; }
+	.cal-event-pill.other { background-color: #9ca3af; }
+
+	/* Events without external links */
+	.cal-event-pill.no-link {
+		cursor: default;
+		opacity: 0.85;
+	}
+	.cal-event-pill.no-link:hover {
+		opacity: 0.85; /* No hover effect since not clickable */
+	}
+
+	.more-events {
+		font-size: 0.7rem;
+		color: var(--text-muted);
+		text-align: center;
+		margin-top: 0.1rem;
+	}
+	
+	@media (max-width: 640px) {
+		.calendar-container {
+			padding: 0.25rem; /* Minimize padding on mobile */
+		}
+
+		.calendar-header h3 {
+			font-size: 1.1rem;
+		}
+
+		.calendar-grid {
+			gap: 1px; /* Tighter gap */
+		}
+		
+		.weekday {
+			font-size: 0.7rem;
+			padding-bottom: 0.15rem;
+		}
+
+		.calendar-day {
+			min-height: 50px;
+			padding: 2px;
+			border-radius: 2px;
+		}
+
+		.day-number {
+			font-size: 0.7rem;
+			margin-bottom: 1px;
+		}
+
+		/* Optional: Hide day number if event takes over, or keep it small */
+
+		.cal-event-pill {
+			font-size: 0.6rem;
+			padding: 1px 2px;
+			border-radius: 2px;
+			line-height: 1.1;
+		}
+		
+		.more-events {
+			display: none; 
+		}
+	}
+
+</style>

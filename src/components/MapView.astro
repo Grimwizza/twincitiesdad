@@ -1,0 +1,176 @@
+---
+import { localEvents } from '../data/events';
+
+// Calculate event counts per region
+const regionCounts = localEvents.reduce((acc, event) => {
+	acc[event.region] = (acc[event.region] || 0) + 1;
+	return acc;
+}, {} as Record<string, number>);
+
+const regions = [
+	{ id: 'north', name: 'North Metro', path: 'M 100,0 L 300,0 L 300,100 L 100,100 Z' },
+	{ id: 'west', name: 'West Metro', path: 'M 0,0 L 100,0 L 100,380 L 0,380 Z' },
+	{ id: 'mpls', name: 'Minneapolis', path: 'M 100,100 L 200,100 L 200,280 L 100,280 Z' },
+	{ id: 'stpaul', name: 'St. Paul', path: 'M 200,100 L 300,100 L 300,280 L 200,280 Z' },
+	{ id: 'east', name: 'East Metro', path: 'M 300,0 L 400,0 L 400,380 L 300,380 Z' },
+	{ id: 'south', name: 'South Metro', path: 'M 100,280 L 300,280 L 300,380 L 100,380 Z' },
+];
+---
+
+<div class="map-container">
+	<div class="map-wrapper">
+		<svg viewBox="0 0 400 380" class="metro-map">
+			<defs>
+				<filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+					<feGaussianBlur stdDeviation="3" result="blur" />
+					<feComposite in="SourceGraphic" in2="blur" operator="over" />
+				</filter>
+			</defs>
+			
+			{regions.map(region => (
+				<g 
+					class="region-group" 
+					data-region={region.id}
+					tabindex="0"
+					role="button"
+					aria-label={`Filter by ${region.name}`}
+				>
+					<path d={region.path} class={`region-path ${region.id}`} />
+					<text 
+						x="0" 
+						y="0" 
+						class="region-label" 
+						text-anchor="middle"
+						style={`transform-box: fill-box; transform-origin: center; transform: translate(${
+							region.id === 'mpls' ? '150px, 190px' :
+							region.id === 'stpaul' ? '250px, 190px' :
+							region.id === 'north' ? '200px, 50px' :
+							region.id === 'south' ? '200px, 330px' :
+							region.id === 'west' ? '50px, 190px' :
+							'350px, 190px'
+						})`}
+					>
+						{region.name}
+						{regionCounts[region.id] && <tspan x="0" dy="1.2em" class="region-count">({regionCounts[region.id]})</tspan>}
+					</text>
+				</g>
+			))}
+		</svg>
+	</div>
+	
+	<div class="map-instructions">
+		<p>Select a region to show events near you.</p>
+		<button id="reset-map-filter" class="reset-btn hidden">Clear Selection</button>
+	</div>
+</div>
+
+<style>
+	.map-container {
+		background: var(--bg-secondary);
+		border-radius: var(--radius-xl);
+		padding: 1rem; /* Reduced padding from 2rem to ensure fit */
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		text-align: center;
+		margin-bottom: 2rem;
+		min-height: 400px; /* Ensure map is visible */
+	}
+
+	.map-wrapper {
+		max-width: 500px;
+		margin: 0 auto;
+		filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.1));
+		background-image: url('/images/twin-cities-map-bg.png');
+		background-size: cover;
+		background-position: center;
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+		position: relative;
+	}
+
+	.metro-map {
+		width: 100%;
+		height: auto;
+		overflow: visible;
+		display: block;
+	}
+
+	.region-group {
+		cursor: pointer;
+		transition: transform 0.3s ease;
+	}
+
+	.region-group:hover {
+		/* transform: scale(1.02); Removed scale to keep alignment with map */
+		z-index: 10;
+	}
+
+	.region-group.active .region-path {
+		stroke: white;
+		stroke-width: 3px;
+		stroke-dasharray: none;
+		filter: url(#glow);
+		fill-opacity: 0.4;
+	}
+
+	.region-path {
+		fill: transparent;
+		stroke: rgba(255, 255, 255, 0.6);
+		stroke-width: 2px;
+		stroke-dasharray: 6 4;
+		transition: all 0.3s ease;
+	}
+
+	/* Region Colors - Applied on Hover/Active */
+	.region-group:hover .region-path.mpls, .region-group.active .region-path.mpls { fill: var(--accent); }
+	.region-group:hover .region-path.stpaul, .region-group.active .region-path.stpaul { fill: var(--accent-light); }
+	.region-group:hover .region-path.north, .region-group.active .region-path.north { fill: var(--success); }
+	.region-group:hover .region-path.south, .region-group.active .region-path.south { fill: var(--warning); }
+	.region-group:hover .region-path.west, .region-group.active .region-path.west { fill: var(--error); }
+	.region-group:hover .region-path.east, .region-group.active .region-path.east { fill: var(--accent-dark); }
+
+	.region-group:hover .region-path {
+		fill-opacity: 0.3;
+		stroke: white;
+		stroke-dasharray: none;
+	}
+
+	.region-label {
+		fill: white;
+		font-size: 14px;
+		font-weight: 800;
+		text-shadow: 0 0 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6);
+		pointer-events: none;
+	}
+
+	.region-count {
+		font-size: 11px;
+		fill: rgba(255, 255, 255, 1);
+		font-weight: bold;
+	}
+
+	.map-instructions {
+		margin-top: 1rem;
+		color: var(--text-muted);
+		font-size: 0.9rem;
+	}
+	
+	.hidden {
+		display: none;
+	}
+	
+	.reset-btn {
+		background: #374151;
+		color: white;
+		border: none;
+		padding: 0.5rem 1rem;
+		border-radius: 9999px;
+		font-size: 0.8rem;
+		cursor: pointer;
+		margin-top: 0.5rem;
+		transition: background 0.2s;
+	}
+	
+	.reset-btn:hover {
+		background: #4b5563;
+	}
+</style>
