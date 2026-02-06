@@ -74,24 +74,29 @@ function getSources(): EventSource[] {
 }
 
 export async function fetchExternalEvents(): Promise<Event[]> {
-    const allEvents: Event[] = [];
-    const sources = getSources();
+    try {
+        const allEvents: Event[] = [];
+        const sources = getSources();
 
-    for (const source of sources) {
-        try {
-            if (source.type === 'ics') {
-                const events = await fetchIcsEvents(source);
-                allEvents.push(...events);
-            } else if (source.type === 'rss') {
-                const events = await fetchRssEvents(source);
-                allEvents.push(...events);
+        for (const source of sources) {
+            try {
+                if (source.type === 'ics') {
+                    const events = await fetchIcsEvents(source);
+                    allEvents.push(...events);
+                } else if (source.type === 'rss') {
+                    const events = await fetchRssEvents(source);
+                    allEvents.push(...events);
+                }
+            } catch (error) {
+                console.error(`Error fetching from ${source.name || source.url}:`, error);
             }
-        } catch (error) {
-            console.error(`Error fetching from ${source.name || source.url}:`, error);
         }
-    }
 
-    return allEvents;
+        return allEvents;
+    } catch (globalError) {
+        console.error('CRITICAL: Failed to fetch external events:', globalError);
+        return [];
+    }
 }
 
 async function fetchIcsEvents(source: EventSource): Promise<Event[]> {
