@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
-    "@astrojs/node": "^9.5.2",
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",
+    "@astrojs/vercel": "^9.0.4",
     "astro": "^5.16.15",
     "date-fns": "^4.1.0",
     "node-ical": "^0.23.1",
