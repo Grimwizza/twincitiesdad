@@ -1,9 +1,6 @@
 backend:
-  name: github
-  repo: Grimwizza/twincitiesdad
+  name: git-gateway
   branch: main
-  base_url: https://twincitiesdad.netlify.app
-  auth_endpoint: .netlify/identity
 
 # Store uploaded images in src/assets
 media_folder: src/assets
