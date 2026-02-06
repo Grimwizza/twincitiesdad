@@ -190,7 +190,7 @@ function parseEventTypeFromTitle(title) {
 }
 function getSources() {
   const sources = [];
-  const googleCalendarUrl = "https://calendar.google.com/calendar/ical/OTRiMjYyZWE5NWZhNTlkZGVjYmQyZGRjMDYyYmU1M2ZlNTJjYTM3Mjg5MDhjYTM5YzQ3ZDY4YmJjYWI3M2ZjMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t/public/basic.ics";
+  const googleCalendarUrl = "https://calendar.google.com/calendar/embed?src=po92bfo5vcg0k099arlcm9femqcglfa2%40import.calendar.google.com&ctz=America%2FChicago";
   {
     sources.push({
       type: "ics",
@@ -212,22 +212,27 @@ function getSources() {
   return sources;
 }
 async function fetchExternalEvents() {
-  const allEvents = [];
-  const sources = getSources();
-  for (const source of sources) {
-    try {
-      if (source.type === "ics") {
-        const events = await fetchIcsEvents(source);
-        allEvents.push(...events);
-      } else if (source.type === "rss") {
-        const events = await fetchRssEvents(source);
-        allEvents.push(...events);
+  try {
+    const allEvents = [];
+    const sources = getSources();
+    for (const source of sources) {
+      try {
+        if (source.type === "ics") {
+          const events = await fetchIcsEvents(source);
+          allEvents.push(...events);
+        } else if (source.type === "rss") {
+          const events = await fetchRssEvents(source);
+          allEvents.push(...events);
+        }
+      } catch (error) {
+        console.error(`Error fetching from ${source.name || source.url}:`, error);
       }
-    } catch (error) {
-      console.error(`Error fetching from ${source.name || source.url}:`, error);
     }
+    return allEvents;
+  } catch (globalError) {
+    console.error("CRITICAL: Failed to fetch external events:", globalError);
+    return [];
   }
-  return allEvents;
 }
 async function fetchIcsEvents(source) {
   const events = [];
