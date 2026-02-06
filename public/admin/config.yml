@@ -3,7 +3,7 @@ backend:
   repo: Grimwizza/twincitiesdad
   branch: main
   base_url: https://twincitiesdad.netlify.app
-  auth_endpoint: .netlify/identity/v1/authorize
+  auth_endpoint: .netlify/identity
 
 # Store uploaded images in src/assets
 media_folder: src/assets
