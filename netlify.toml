@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Only build if there are changes in these directories/files
+# This prevents builds when I update task.md, README.md, or other docs
+[build.processing]
+  skip_processing = false
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Ignore builds for documentation changes
+# This command returns exit code 0 (success) to CANCEL the build
+# It checks if changes are ONLY in non-essential files
+[build]
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':!src' ':!public' ':!astro.config.mjs' ':!package.json' ':!netlify.toml'"
