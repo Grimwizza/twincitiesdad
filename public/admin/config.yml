@@ -21,3 +21,15 @@ collections:
       - { label: "Publish Date", name: "pubDate", widget: "datetime", format: "MMM DD YYYY" }
       - { label: "Hero Image", name: "heroImage", widget: "image", required: false }
       - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: pages
+    label: Pages
+    files:
+      - name: about
+        label: About Page
+        file: src/content/pages/about.md
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Body", name: "body", widget: "markdown" }
+

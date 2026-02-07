@@ -1,88 +1,99 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_TITLE, SOCIAL_LINKS } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { SITE_TITLE, SOCIAL_LINKS } from "../consts";
+import { getEntry } from "astro:content";
+
+const aboutPage = await getEntry("pages", "about");
+if (!aboutPage) {
+	throw new Error("Could not find about page");
+}
+const { Content } = await aboutPage.render();
+const { title, description } = aboutPage.data;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={`About | ${SITE_TITLE}`} description="About Twin Cities Dad - a father documenting life in Minnesota during these challenging times." />
+		<BaseHead
+			title={`${title} | ${SITE_TITLE}`}
+			description={description}
+		/>
 		<style>
 			.about-container {
 				max-width: 800px;
 				margin: 0 auto;
 				padding: 3rem 1.5rem 4rem;
 			}
-			
+
 			.about-header {
 				text-align: center;
 				margin-bottom: 3rem;
 			}
-			
+
 			.about-header h1 {
 				font-size: clamp(2rem, 5vw, 3rem);
 				margin-bottom: 1rem;
 			}
-			
+
 			.about-header p {
 				color: var(--text-muted);
 				font-size: 1.1rem;
 			}
-			
+
 			.about-content {
 				background: var(--bg-secondary);
 				border-radius: var(--radius-xl);
 				padding: 2.5rem;
 				border: 1px solid rgba(255, 255, 255, 0.05);
 			}
-			
-			.about-content h2 {
+
+			.about-content :global(h2) {
 				font-size: 1.5rem;
 				margin-top: 2rem;
 				margin-bottom: 1rem;
 				color: var(--text-primary);
 			}
-			
-			.about-content h2:first-child {
+
+			.about-content :global(h2:first-child) {
 				margin-top: 0;
 			}
-			
-			.about-content p {
+
+			.about-content :global(p) {
 				color: var(--text-secondary);
 				line-height: 1.8;
 				margin-bottom: 1.5rem;
 			}
-			
-			.about-content ul {
+
+			.about-content :global(ul) {
 				color: var(--text-secondary);
 				padding-left: 1.5rem;
 				margin-bottom: 1.5rem;
 			}
-			
-			.about-content li {
+
+			.about-content :global(li) {
 				margin-bottom: 0.5rem;
 				line-height: 1.6;
 			}
-			
+
 			.connect-section {
 				margin-top: 2.5rem;
 				padding-top: 2rem;
 				border-top: 1px solid var(--bg-tertiary);
 			}
-			
+
 			.connect-section h2 {
 				margin-top: 0;
 			}
-			
+
 			.social-buttons {
 				display: flex;
 				gap: 1rem;
 				flex-wrap: wrap;
 				margin-top: 1.5rem;
 			}
-			
+
 			.social-btn {
 				display: flex;
 				align-items: center;
@@ -95,24 +106,31 @@ import { SITE_TITLE, SOCIAL_LINKS } from '../consts';
 				font-weight: 500;
 				transition: all var(--transition-fast);
 			}
-			
+
 			.social-btn:hover {
 				transform: translateY(-2px);
 				text-decoration: none;
 			}
-			
+
 			.social-btn.twitter:hover {
-				background: #1DA1F2;
+				background: #1da1f2;
 			}
-			
+
 			.social-btn.facebook:hover {
-				background: #1877F2;
+				background: #1877f2;
 			}
-			
+
 			.social-btn.instagram:hover {
-				background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+				background: linear-gradient(
+					45deg,
+					#f09433,
+					#e6683c,
+					#dc2743,
+					#cc2366,
+					#bc1888
+				);
 			}
-			
+
 			.social-btn svg {
 				width: 20px;
 				height: 20px;
@@ -124,59 +142,61 @@ import { SITE_TITLE, SOCIAL_LINKS } from '../consts';
 		<main class="container">
 			<div class="about-container">
 				<header class="about-header">
-					<h1>👋 About Me</h1>
-					<p>A father in Minnesota navigating these turbulent times.</p>
+					<h1>{title}</h1>
+					<p>{description}</p>
 				</header>
-				
+
 				<div class="about-content">
-					<h2>Why This Blog?</h2>
-					<p>
-						I'm a dad living in the Twin Cities, and like many of you, I've been watching the world 
-						change around us at a dizzying pace. Between raising kids, working, and trying to stay 
-						informed, it's a lot to process.
-					</p>
-					<p>
-						This blog is my attempt to make sense of it all. I write about what I see happening in 
-						Minnesota—the politics, the community events, the challenges, and yes, the hope too. 
-						I try to back up my observations with facts and data, because in an age of 
-						misinformation, truth matters more than ever.
-					</p>
-					
-					<h2>What You'll Find Here</h2>
-					<ul>
-						<li>🏛️ <strong>Political Analysis</strong> — Making sense of what's happening at the state and local level</li>
-						<li>📊 <strong>Facts & Data</strong> — Evidence-based perspectives, not just opinions</li>
-						<li>📰 <strong>News Commentary</strong> — Breaking down the stories that matter to families</li>
-						<li>🏡 <strong>Community Stories</strong> — What it's really like raising kids here</li>
-						<li>📹 <strong>Videos & Media</strong> — Visual stories from around the Twin Cities</li>
-					</ul>
-					
-					<h2>A Father's Perspective</h2>
-					<p>
-						Everything I write comes through the lens of being a parent. What does this policy mean 
-						for our schools? How does this decision affect our neighborhoods? What kind of Minnesota 
-						are we leaving for our children?
-					</p>
-					<p>
-						These are the questions that keep me up at night, and they're the questions I try to 
-						explore here. I don't have all the answers, but I believe in the power of honest 
-						conversation and community.
-					</p>
-					
+					<Content />
+
 					<div class="connect-section">
 						<h2>Connect With Me</h2>
-						<p>I'd love to hear from you. Follow along on social media, share your thoughts, and let's build a conversation about what matters.</p>
+						<p>
+							I'd love to hear from you. Follow along on social
+							media, share your thoughts, and let's build a
+							conversation about what matters.
+						</p>
 						<div class="social-buttons">
-							<a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" class="social-btn twitter">
-								<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+							<a
+								href={SOCIAL_LINKS.twitter}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="social-btn twitter"
+							>
+								<svg viewBox="0 0 24 24"
+									><path
+										fill="currentColor"
+										d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+									></path></svg
+								>
 								Twitter / X
 							</a>
-							<a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" class="social-btn facebook">
-								<svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+							<a
+								href={SOCIAL_LINKS.facebook}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="social-btn facebook"
+							>
+								<svg viewBox="0 0 24 24"
+									><path
+										fill="currentColor"
+										d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+									></path></svg
+								>
 								Facebook
 							</a>
-							<a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" class="social-btn instagram">
-								<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+							<a
+								href={SOCIAL_LINKS.instagram}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="social-btn instagram"
+							>
+								<svg viewBox="0 0 24 24"
+									><path
+										fill="currentColor"
+										d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+									></path></svg
+								>
 								Instagram
 							</a>
 						</div>
