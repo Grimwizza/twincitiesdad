@@ -1,6 +1,12 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: Grimwizza/twincitiesdad
   branch: main
+  # Use pkce auth - works without any OAuth proxy setup
+  auth_type: pkce
+  app_id: Ov23lixMex879RmKRbbc
+
+site_url: https://twincitiesdad.com
 
 # Store uploaded images in src/assets
 media_folder: src/assets
