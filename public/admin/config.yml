@@ -32,4 +32,22 @@ collections:
           - { label: "Title", name: "title", widget: "string" }
           - { label: "Description", name: "description", widget: "text" }
           - { label: "Body", name: "body", widget: "markdown" }
+      - name: events
+        label: Events Page
+        file: src/content/pages/events.md
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Body", name: "body", widget: "markdown", required: false }
+
+  - name: settings
+    label: Settings
+    files:
+      - name: social
+        label: Social Media Links
+        file: src/data/settings.json
+        fields:
+          - { label: "Twitter URL", name: "twitter", widget: "string" }
+          - { label: "Facebook URL", name: "facebook", widget: "string" }
+          - { label: "Instagram URL", name: "instagram", widget: "string" }
 

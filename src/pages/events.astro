@@ -25,12 +25,23 @@ const mParam = Astro.url.searchParams.get("month");
 const yParam = Astro.url.searchParams.get("year");
 const initialMonth = mParam ? parseInt(mParam, 10) : undefined;
 const initialYear = yParam ? parseInt(yParam, 10) : undefined;
+// Fetch page content
+import { getEntry } from "astro:content";
+const eventsPage = await getEntry("pages", "events");
+const { title, description } = eventsPage
+	? eventsPage.data
+	: {
+			title: "🗓️ Twin Cities Events",
+			description:
+				"Stay informed about protests, concerts, and community gatherings happening near you.",
+		};
+const { Content } = eventsPage
+	? await eventsPage.render()
+	: { Content: Fragment };
+import { Fragment } from "astro/jsx-runtime";
 ---
 
-<PageLayout
-	title={`Events | ${SITE_TITLE}`}
-	description="Upcoming events, protests, and community gatherings in the Twin Cities."
->
+<PageLayout title={`${title} | ${SITE_TITLE}`} description={description}>
 	<style>
 		.page-header {
 			text-align: center;
@@ -53,6 +64,18 @@ const initialYear = yParam ? parseInt(yParam, 10) : undefined;
 			color: var(--text-muted);
 			max-width: 600px;
 			margin: 0 auto;
+		}
+
+		.page-intro-content {
+			max-width: 700px;
+			margin: 1.5rem auto 0;
+			color: var(--text-secondary);
+			line-height: 1.6;
+		}
+
+		.page-intro-content :global(a) {
+			color: var(--accent-light);
+			text-decoration: underline;
 		}
 
 		.suggest-box {
@@ -132,11 +155,12 @@ const initialYear = yParam ? parseInt(yParam, 10) : undefined;
 
 	<main class="container">
 		<header class="page-header">
-			<h1>🗓️ Twin Cities Events</h1>
-			<p>
-				Stay informed about protests, concerts, and community gatherings
-				happening near you.
-			</p>
+			<h1>{title}</h1>
+			<p>{description}</p>
+
+			<div class="page-intro-content">
+				<Content />
+			</div>
 
 			<div class="suggest-box">
 				Know of an event? <a href="mailto:events@twincitiesdad.com"
