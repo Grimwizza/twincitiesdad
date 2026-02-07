@@ -6,18 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
   <title>Content Manager | Twin Cities Dad</title>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script>
-    // Point the widget to the correct Netlify site
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.init({
-        APIUrl: 'https://twincitiesdad.netlify.app/.netlify/identity'
-      });
-    }
-  </script>
 </head>
 
 <body>
+  <!-- Decap CMS will handle GitHub PKCE auth directly -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
 
