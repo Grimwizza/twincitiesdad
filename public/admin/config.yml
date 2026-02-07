@@ -1,9 +1,6 @@
 backend:
-  name: github
-  repo: Grimwizza/twincitiesdad
+  name: git-gateway
   branch: main
-  # Use Netlify's OAuth provider (configured in Netlify dashboard)
-  site_domain: twincitiesdad.netlify.app
 
 site_url: https://twincitiesdad.com
 
