@@ -77,6 +77,10 @@ const { title, description, image = FallbackImage } = Astro.props;
 	src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script is:inline>
 	if (window.netlifyIdentity) {
+		// Point to the Netlify site for identity
+		window.netlifyIdentity.init({
+			APIUrl: "https://twincitiesdad.netlify.app/.netlify/identity",
+		});
 		window.netlifyIdentity.on("init", (user) => {
 			if (!user) {
 				window.netlifyIdentity.on("login", () => {
