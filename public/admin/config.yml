@@ -2,9 +2,8 @@ backend:
   name: github
   repo: Grimwizza/twincitiesdad
   branch: main
-  # Use pkce auth - works without any OAuth proxy setup
-  auth_type: pkce
-  app_id: Ov23lixMex879RmKRbbc
+  # Use Netlify's OAuth provider (configured in Netlify dashboard)
+  site_domain: twincitiesdad.netlify.app
 
 site_url: https://twincitiesdad.com
 
